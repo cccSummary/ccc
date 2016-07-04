@@ -4,7 +4,6 @@ import project.example.com.mymusicproject.model.MusicInfo;
 
 /**
  * 播放进度监听器
- * Created by hzwangchenyan on 2015/12/17.
  */
 public interface OnPlayerEventListener {
     /**

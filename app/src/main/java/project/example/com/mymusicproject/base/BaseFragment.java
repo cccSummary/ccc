@@ -8,11 +8,15 @@ import android.support.v4.app.Fragment;
 import android.view.View;
 
 import butterknife.ButterKnife;
+import project.example.com.mymusicproject.page.MusicListActivity;
+import project.example.com.mymusicproject.service.PlayService;
 
 /**
  * 基类
+ * Created by wcy on 2015/11/26.
  */
 public abstract class BaseFragment extends Fragment {
+    private PlayService mPlayService;
     protected Handler mHandler;
     private boolean mResumed;
 
@@ -25,9 +29,9 @@ public abstract class BaseFragment extends Fragment {
     @Override
     public void onAttach(Activity activity) {
         super.onAttach(activity);
-//        if (activity instanceof MusicActivity) {
-//            mPlayService = ((MusicActivity) activity).getPlayService();
-//        }
+        if (activity instanceof MusicListActivity) {
+            mPlayService = ((MusicListActivity) activity).getPlayService();
+        }
     }
 
     @Override
@@ -47,5 +51,7 @@ public abstract class BaseFragment extends Fragment {
         return mResumed;
     }
 
-
+    protected PlayService getPlayService() {
+        return mPlayService;
+    }
 }

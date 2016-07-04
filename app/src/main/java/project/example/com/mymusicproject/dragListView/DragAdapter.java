@@ -56,6 +56,7 @@ public class DragAdapter extends BaseExpandableListAdapter {
         TextView tvTitle;
         @Bind(R.id.artist)
         TextView tvArtist;
+
         public ViewHolder(View view) {
             ButterKnife.bind(this, view);
         }
@@ -100,14 +101,18 @@ public class DragAdapter extends BaseExpandableListAdapter {
             itemHolder = (ViewHolder) convertView.getTag();
         }
         MusicInfo music = (MusicInfo) getChild(groupPosition, childPosition);
-
         //1.是否载入默认 2.是否小图
-        Bitmap bm = PictureLoader.getArtwork(mContext, music.getId(), music.getAlbumId(), true, false);
-        if(bm == null) {
-            itemHolder.ivCover.setImageResource(R.drawable.audio);
+//        ImageLoader.getInstance().displayImage(music.getAlbum(), itemHolder.ivCover, R.drawable.default_cover);
+        Bitmap cover = PictureLoader.getArtwork(mContext, music.getId(), music.getAlbumId(), true, false);
+        if (cover == null) {
+            itemHolder.ivCover.setImageResource(R.drawable.default_cover);
         } else {
-            itemHolder.ivCover.setImageBitmap(bm);
+            itemHolder.ivCover.setImageBitmap(cover);
         }
+//
+////        //1.是否载入默认 2.是否小图
+////        Bitmap bm = PictureLoader.getArtwork(mContext, music.getId(), music.getAlbumId(), true, false);
+
         itemHolder.tvTitle.setText(music.getTitle());
         itemHolder.tvArtist.setText(music.getArtist());
         return convertView;

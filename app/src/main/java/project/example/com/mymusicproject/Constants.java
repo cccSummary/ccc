@@ -1,8 +1,6 @@
 package project.example.com.mymusicproject;
 
 /**
- *
- *
  * @auther ccc
  * created at 2016/6/30 16:54
  ***/
@@ -16,5 +14,7 @@ public class Constants {
     public static final String ACTION_MEDIA_PLAY_PAUSE = "project.example.com.mymusicproject.ACTION_MEDIA_PLAY_PAUSE";
     public static final String ACTION_MEDIA_NEXT = "project.example.com.mymusicproject.ACTION_MEDIA_NEXT";
     public static final String ACTION_MEDIA_PREVIOUS = "project.example.com.mymusicproject.ACTION_MEDIA_PREVIOUS";
-    public static final String VOLUME_CHANGED_ACTION = "android.media.VOLUME_CHANGED_ACTION";
+    public static final String MUSIC_LIST_TYPE = "music_list_type";
+    public static final String TING_UID = "ting_uid";
+    public static final String FROM_NOTIFICATION = "from_notification";
 }

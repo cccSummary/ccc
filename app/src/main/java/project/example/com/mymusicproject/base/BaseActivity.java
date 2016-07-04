@@ -8,6 +8,7 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
@@ -15,16 +16,18 @@ import android.view.WindowManager;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 
+import butterknife.Bind;
 import butterknife.ButterKnife;
+import project.example.com.mymusicproject.R;
+import project.example.com.mymusicproject.service.PlayService;
 
 /**
  * 基类
- *
- *
+ * 如果继承本类，需要在 layout 中添加 {@link Toolbar} ，并将 AppTheme 继承 Theme.AppCompat.NoActionBar 。
  */
 public abstract class BaseActivity extends AppCompatActivity {
-//    @Bind(R.id.toolbar)
-//    Toolbar mToolbar;
+    @Bind(R.id.toolbar)
+    Toolbar mToolbar;
     protected Handler mHandler;
 
     @Override
@@ -32,6 +35,7 @@ public abstract class BaseActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         mHandler = new Handler();
         setSystemBarTransparent();
+        PlayService.addToStack(this);
         setVolumeControlStream(AudioManager.STREAM_MUSIC);
     }
 
@@ -56,10 +60,10 @@ public abstract class BaseActivity extends AppCompatActivity {
     private void initView() {
         ButterKnife.bind(this);
 
-//        if (mToolbar == null) {
-//            throw new IllegalStateException("Layout is required to include a Toolbar with id 'toolbar'");
-//        }
-//        setSupportActionBar(mToolbar);
+        if (mToolbar == null) {
+            throw new IllegalStateException("Layout is required to include a Toolbar with id 'toolbar'");
+        }
+        setSupportActionBar(mToolbar);
         if (getSupportActionBar() != null) {
             getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         }
@@ -96,6 +100,7 @@ public abstract class BaseActivity extends AppCompatActivity {
 
     @Override
     protected void onDestroy() {
+        PlayService.removeFromStack(this);
         super.onDestroy();
     }
 

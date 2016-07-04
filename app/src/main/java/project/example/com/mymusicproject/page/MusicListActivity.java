@@ -1,19 +1,20 @@
 package project.example.com.mymusicproject.page;
 
-import android.app.Activity;
+import android.content.ComponentName;
+import android.content.Context;
 import android.content.Intent;
+import android.content.ServiceConnection;
 import android.graphics.Bitmap;
-import android.media.AudioManager;
-import android.media.MediaPlayer;
 import android.os.Bundle;
+import android.os.IBinder;
+import android.support.v4.app.FragmentTransaction;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.ExpandableListView;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
-import android.widget.Toast;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.LinkedHashMap;
@@ -22,18 +23,25 @@ import java.util.Map;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
+import project.example.com.mymusicproject.Constants;
 import project.example.com.mymusicproject.R;
+import project.example.com.mymusicproject.base.BaseActivity;
 import project.example.com.mymusicproject.dragListView.DragAdapter;
 import project.example.com.mymusicproject.dragListView.DragListView;
+import project.example.com.mymusicproject.fragment.MusicPlayFragment;
 import project.example.com.mymusicproject.loader.MusicLoader;
 import project.example.com.mymusicproject.loader.PictureLoader;
 import project.example.com.mymusicproject.model.MusicInfo;
+import project.example.com.mymusicproject.service.OnPlayerEventListener;
+import project.example.com.mymusicproject.service.PlayService;
+import project.example.com.mymusicproject.util.SystemUtils;
 
 /**
  * Created by Administrator on 2016/6/21.
  * 音乐播放
  */
-public class MusicListActivity extends Activity implements ExpandableListView.OnChildClickListener, View.OnClickListener {
+public class MusicListActivity extends BaseActivity implements ExpandableListView.OnChildClickListener,
+        View.OnClickListener, OnPlayerEventListener {
 
     @Bind(R.id.expendlist)
     DragListView expendlist;
@@ -55,11 +63,6 @@ public class MusicListActivity extends Activity implements ExpandableListView.On
     @Bind(R.id.fl_play_bar)
     LinearLayout flPlayBar;
     /**
-     * 标题
-     **/
-    @Bind(R.id.base_titlebar_title)
-    TextView baseTitlebarTitle;
-    /**
      * 封面图
      **/
     @Bind(R.id.iv_play_bar_cover)
@@ -79,10 +82,6 @@ public class MusicListActivity extends Activity implements ExpandableListView.On
      **/
     private ArrayList<MusicInfo> musicList;
     /**
-     * 音频播放控件
-     **/
-    private MediaPlayer mediaPlayer;
-    /**
      * 点击的音乐
      **/
     private int currentPosition;
@@ -91,6 +90,10 @@ public class MusicListActivity extends Activity implements ExpandableListView.On
      **/
     private List<String> group_list = new ArrayList<>();
     private Map<String, ArrayList<MusicInfo>> children;
+    private MusicPlayFragment mPlayFragment;
+    private PlayService mPlayService;
+    private boolean isPlayFragmentShow = false;
+    private MenuItem timerItem;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -100,20 +103,65 @@ public class MusicListActivity extends Activity implements ExpandableListView.On
         setGroupData();
         initView();
         setListener();
+        bindService();
+    }
+
+    @Override
+    protected void onNewIntent(Intent intent) {
+        super.onNewIntent(intent);
+        parseIntent(intent);
+    }
+
+    private void bindService() {
+        Intent intent = new Intent();
+        intent.setClass(this, PlayService.class);
+        bindService(intent, mPlayServiceConnection, Context.BIND_AUTO_CREATE);
+    }
+
+    private void parseIntent(Intent intent) {
+        if (intent.hasExtra(Constants.FROM_NOTIFICATION)) {
+            showPlayingFragment();
+        }
+    }
+
+    private ServiceConnection mPlayServiceConnection = new ServiceConnection() {
+        @Override
+        public void onServiceConnected(ComponentName name, IBinder service) {
+            mPlayService = ((PlayService.PlayBinder) service).getService();
+            mPlayService.setOnPlayEventListener(MusicListActivity.this);
+        }
+
+        @Override
+        public void onServiceDisconnected(ComponentName name) {
+        }
+    };
+
+    private void play() {
+        getPlayService().playPause();
+    }
+
+    private void previous() {
+        getPlayService().prev();
+    }
+
+    private void next() {
+        getPlayService().next();
+    }
+
+    public PlayService getPlayService() {
+        return mPlayService;
     }
 
     /**
      * 初始化
      */
     public void initView() {
-        mediaPlayer = new MediaPlayer();
         expendlist.setDragOnLongPress(true);
         expendlist.setAdapter(new DragAdapter(this, group_list, children));
         int groupCount = expendlist.getCount();//默认列表展开
         for (int i = 0; i < groupCount; i++) {
             expendlist.expandGroup(i);
         }
-        baseTitlebarTitle.setText("音乐列表");
         setViewData();
     }
 
@@ -141,7 +189,6 @@ public class MusicListActivity extends Activity implements ExpandableListView.On
 
     private void setChildrenData() {
         children = Collections.synchronizedMap(new LinkedHashMap<String, ArrayList<MusicInfo>>());
-
         for (String s : group_list) {
             ArrayList<MusicInfo> array = new ArrayList<MusicInfo>();
             array.addAll(musicList);
@@ -154,88 +201,57 @@ public class MusicListActivity extends Activity implements ExpandableListView.On
     public void onClick(View view) {
         switch (view.getId()) {
             case R.id.iv_play_bar_play:
-                //当音乐在播放时
-                if (mediaPlayer.isPlaying()) {
-                    //暂停
-                    pause();
-                } else {
-                    //不在播放，则播放
-                    setMediaPlay();
-                }
+                getPlayService().play(currentPosition);
+                setViewData();
                 break;
             case R.id.iv_play_bar_next://下一曲
                 next();
+                if (currentPosition < musicList.size()) {
+                    currentPosition++;
+                    setViewData();
+                } else {
+//                  Toast.
+                }
+
                 break;
             case R.id.iv_play_bar_previous://上一曲
                 previous();
+                if (currentPosition > 0) {
+                    currentPosition--;
+                    setViewData();
+                } else {
+//                    Toast.makeText("已经是第一首啦", Toast.LENGTH_SHORT).show();
+                }
                 break;
             case R.id.fl_play_bar:
-                gotoMusicDetail();
+                showPlayingFragment();
                 break;
         }
     }
 
-    //播放上一曲
-    private void previous() {
-        //判断是否为第一首歌曲，若为第一首歌曲，则播放最后一首
-        currentPosition--;
-        if (currentPosition <= 0) {
-            Toast.makeText(this, "已经是第一首了", Toast.LENGTH_SHORT).show();
-            return;
+    private void showPlayingFragment() {
+        FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
+        ft.setCustomAnimations(R.anim.fragment_slide_up, 0);
+        if (mPlayFragment == null) {
+            mPlayFragment = new MusicPlayFragment();
+            ft.replace(android.R.id.content, mPlayFragment);
         } else {
-            //播放
-            setMediaPlay();
+            ft.show(mPlayFragment);
         }
+        ft.commit();
+        isPlayFragmentShow = true;
     }
 
-    //播放下一曲（与上一曲类似）
-    private void next() {
-        currentPosition++;
-        if (currentPosition >= musicList.size()) {
-            Toast.makeText(this, "已经是最后一首了", Toast.LENGTH_SHORT).show();
-            return;
-        } else {
-            setMediaPlay();
-        }
+    private void hidePlayingFragment() {
+        FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
+        ft.setCustomAnimations(0, R.anim.fragment_slide_down);
+        ft.hide(mPlayFragment);
+        ft.commit();
+        isPlayFragmentShow = false;
     }
 
-
-    //暂停
-    private void pause() {
-        //直接调用MediaPlay 中的暂停方法
-        mediaPlayer.pause();
-        //切换为播放的按钮（按钮为android系统自带的按钮，可直接用）
+    public void onPlayerResume() {
         ivPlayBarPlay.setSelected(true);
-    }
-
-    /***
-     * 设置播放
-     *
-     * @param
-     */
-    public void setMediaPlay() {
-        //重置
-        mediaPlayer.reset();
-        try {
-            mediaPlayer.setAudioStreamType(AudioManager.STREAM_MUSIC);
-            //设置音乐文件来源
-            String path = musicList.get(currentPosition).getUrl();
-            mediaPlayer.setDataSource(path);
-            //准备（缓冲文件）
-            mediaPlayer.prepare();
-            //播放开始
-            mediaPlayer.start();
-            //设置按钮图片为暂停图标
-            ivPlayBarPlay.setSelected(false);
-            mediaPlayer.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
-                @Override
-                public void onCompletion(MediaPlayer mediaPlayer) {
-                    next();//顺序播放
-                }
-            });
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
     }
 
     /**
@@ -251,30 +267,66 @@ public class MusicListActivity extends Activity implements ExpandableListView.On
     @Override
     public boolean onChildClick(ExpandableListView expandableListView, View view, int i, int i1, long l) {
         currentPosition = i1;
-        setMediaPlay();
+        getPlayService().play(currentPosition);
         setViewData();
-
         return false;
     }
 
     private void setViewData() {
         MusicInfo music = musicList.get(currentPosition);
-        //1.是否载入默认 2.是否小图
-        Bitmap bm = PictureLoader.getArtwork(this, music.getId(), music.getAlbumId(), true, false);
-        if (bm == null) {
-            ivPlayBarCover.setImageResource(R.drawable.default_cover);
-        } else {
-            ivPlayBarCover.setImageBitmap(bm);
-        }
         tvPlayBarTitle.setText(music.getTitle());
         tvPlayBarArtist.setText(music.getArtist());
-
+        Bitmap cover = PictureLoader.getArtwork(this, music.getId(), music.getAlbumId(), true, false);
+        if (cover == null) {
+            ivPlayBarCover.setImageResource(R.drawable.default_cover);
+        } else {
+            ivPlayBarCover.setImageBitmap(cover);
+        }
     }
 
-    /*
-    *去到音乐播放的详情界面
+    @Override
+    public void onBackPressed() {
+        if (mPlayFragment != null && isPlayFragmentShow) {
+            hidePlayingFragment();
+            return;
+        }
+        if (Boolean.parseBoolean("true")) {
+            super.onBackPressed();
+        } else {
+            moveTaskToBack(false);
+        }
+    }
+
+    @Override
+    public void onTimer(long remain) {
+        if (timerItem == null) {
+        }
+        String title = getString(R.string.menu_timer);
+        timerItem.setTitle(remain == 0 ? title : SystemUtils.formatTime(title + "(mm:ss)", remain));
+    }
+
+    /**
+     * 更新播放进度
      */
-    public void gotoMusicDetail() {
-        startActivity(new Intent(MusicDetailActivity.getIntent(this, musicList.get(currentPosition))));
+    @Override
+    public void onPublish(int progress) {
+        if (mPlayFragment != null && mPlayFragment.isResume()) {
+            mPlayFragment.onPublish(progress);
+        }
+    }
+
+    @Override
+    public void onChange(MusicInfo music) {
+        if (mPlayFragment != null && mPlayFragment.isResume()) {
+            mPlayFragment.onChange(music);
+        }
+    }
+
+    @Override
+    public void onPlayerPause() {
+        ivPlayBarPlay.setSelected(false);
+        if (mPlayFragment != null && mPlayFragment.isResume()) {
+            mPlayFragment.onPlayerPause();
+        }
     }
 }

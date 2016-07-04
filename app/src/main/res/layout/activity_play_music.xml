@@ -2,6 +2,7 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
+
     <ImageView
         android:id="@+id/iv_play_page_bg"
         android:layout_width="match_parent"
@@ -59,28 +60,14 @@
             </LinearLayout>
         </LinearLayout>
 
-        <!--<android.support.v4.view.ViewPager-->
-        <!--android:id="@+id/vp_play_page"-->
-        <!--android:layout_width="match_parent"-->
-        <!--android:layout_height="0dp"-->
-        <!--android:layout_weight="1"-->
-        <!--android:overScrollMode="never" />-->
-
-        <!--&lt;!&ndash;<me.wcy.music.widget.IndicatorLayout&ndash;&gt;-->
-        <!--&lt;!&ndash;android:id="@+id/il_indicator"&ndash;&gt;-->
-        <!--&lt;!&ndash;android:layout_width="wrap_content"&ndash;&gt;-->
-        <!--&lt;!&ndash;android:layout_height="wrap_content"&ndash;&gt;-->
-        <!--&lt;!&ndash;android:layout_gravity="center_horizontal"&ndash;&gt;-->
-        <!--&lt;!&ndash;android:layout_margin="10dp" />&ndash;&gt;-->
-
 
     </LinearLayout>
 
     <ImageView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_centerInParent="true"
         android:layout_above="@+id/play_page_controller"
+        android:layout_centerInParent="true"
         android:src="@mipmap/ic_launcher" />
 
     <LinearLayout

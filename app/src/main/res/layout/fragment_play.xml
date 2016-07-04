@@ -59,19 +59,14 @@
             </LinearLayout>
         </LinearLayout>
 
-        <android.support.v4.view.ViewPager
-            android:id="@+id/vp_play_page"
-            android:layout_width="match_parent"
-            android:layout_height="0dp"
-            android:layout_weight="1"
-            android:overScrollMode="never" />
-
-        <me.wcy.music.widget.IndicatorLayout
-            android:id="@+id/il_indicator"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center_horizontal"
-            android:layout_margin="10dp" />
+        <ImageView
+            android:id="@+id/iv_music_cover"
+            android:layout_width="200dp"
+            android:layout_height="200dp"
+            android:layout_gravity="center"
+            android:layout_marginBottom="50dp"
+            android:layout_marginTop="40dp"
+            android:src="@drawable/play_page_default_cover" />
 
         <include layout="@layout/include_play_page_controller" />
     </LinearLayout>

@@ -1,17 +1,27 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/drawer_layout"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:orientation="vertical">
 
-    <LinearLayout
+    <android.support.design.widget.AppBarLayout
         android:id="@+id/main_topbar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_alignParentTop="true">
 
-        <include
-            layout="@layout/include_app_bar" />
-    </LinearLayout>
+        <android.support.v7.widget.Toolbar
+            android:id="@+id/toolbar"
+            app:popupTheme="@style/ThemeOverlay.AppCompat.Light"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="?attr/colorPrimary"
+            android:visibility="gone" />
+
+        <include layout="@layout/include_app_bar" />
+    </android.support.design.widget.AppBarLayout>
 
     <project.example.com.mymusicproject.dragListView.DragListView
         android:id="@+id/expendlist"
