@@ -18,6 +18,7 @@ import butterknife.ButterKnife;
 import project.example.com.mymusicproject.R;
 import project.example.com.mymusicproject.loader.PictureLoader;
 import project.example.com.mymusicproject.model.MusicInfo;
+import project.example.com.mymusicproject.service.PlayService;
 
 /**
  * Created by CongCong on 6/22/16.
@@ -31,6 +32,7 @@ public class DragAdapter extends BaseExpandableListAdapter {
     private ArrayList<String> groups;
     private Map<String, ArrayList<MusicInfo>> children;
     private List<String> group_list;
+    private int mPlayingPosition;
 
     public DragAdapter(Context context, List<String> group_list, Map<String, ArrayList<MusicInfo>> children) {
         this.mContext = context;
@@ -100,6 +102,7 @@ public class DragAdapter extends BaseExpandableListAdapter {
         } else {
             itemHolder = (ViewHolder) convertView.getTag();
         }
+        mPlayingPosition = childPosition;
         MusicInfo music = (MusicInfo) getChild(groupPosition, childPosition);
         //1.是否载入默认 2.是否小图
 //        ImageLoader.getInstance().displayImage(music.getAlbum(), itemHolder.ivCover, R.drawable.default_cover);
@@ -166,4 +169,16 @@ public class DragAdapter extends BaseExpandableListAdapter {
         return true;
     }
 
+    /**
+     * 更新播放位置
+     *
+     * @param playService
+     */
+    public void updatePlayingPosition(PlayService playService) {
+        if (playService.getPlayingMusic() != null) {
+            mPlayingPosition = playService.getPlayingPosition();
+        } else {
+            mPlayingPosition = -1;
+        }
+    }
 }

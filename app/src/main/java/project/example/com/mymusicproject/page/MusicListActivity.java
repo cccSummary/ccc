@@ -7,6 +7,7 @@ import android.content.ServiceConnection;
 import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.os.IBinder;
+import android.support.design.widget.Snackbar;
 import android.support.v4.app.FragmentTransaction;
 import android.view.MenuItem;
 import android.view.View;
@@ -100,9 +101,6 @@ public class MusicListActivity extends BaseActivity implements ExpandableListVie
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main_layout);
         ButterKnife.bind(this);
-        setGroupData();
-        initView();
-        setListener();
         bindService();
     }
 
@@ -129,6 +127,8 @@ public class MusicListActivity extends BaseActivity implements ExpandableListVie
         public void onServiceConnected(ComponentName name, IBinder service) {
             mPlayService = ((PlayService.PlayBinder) service).getService();
             mPlayService.setOnPlayEventListener(MusicListActivity.this);
+            init();
+            parseIntent(getIntent());
         }
 
         @Override
@@ -136,8 +136,11 @@ public class MusicListActivity extends BaseActivity implements ExpandableListVie
         }
     };
 
-    private void play() {
-        getPlayService().playPause();
+    private void init() {
+        setGroupData();
+        initView();
+        onChange(mPlayService.getPlayingMusic());
+        setListener();
     }
 
     private void previous() {
@@ -157,7 +160,9 @@ public class MusicListActivity extends BaseActivity implements ExpandableListVie
      */
     public void initView() {
         expendlist.setDragOnLongPress(true);
-        expendlist.setAdapter(new DragAdapter(this, group_list, children));
+        DragAdapter mAdapter = new DragAdapter(this, group_list, children);
+        expendlist.setAdapter(mAdapter);
+        mAdapter.updatePlayingPosition(mPlayService);
         int groupCount = expendlist.getCount();//默认列表展开
         for (int i = 0; i < groupCount; i++) {
             expendlist.expandGroup(i);
@@ -187,6 +192,9 @@ public class MusicListActivity extends BaseActivity implements ExpandableListVie
         setChildrenData();
     }
 
+    /**
+     * 设置子类目数据
+     */
     private void setChildrenData() {
         children = Collections.synchronizedMap(new LinkedHashMap<String, ArrayList<MusicInfo>>());
         for (String s : group_list) {
@@ -201,26 +209,22 @@ public class MusicListActivity extends BaseActivity implements ExpandableListVie
     public void onClick(View view) {
         switch (view.getId()) {
             case R.id.iv_play_bar_play:
-                getPlayService().play(currentPosition);
-                setViewData();
+                play();
                 break;
             case R.id.iv_play_bar_next://下一曲
-                next();
                 if (currentPosition < musicList.size()) {
                     currentPosition++;
-                    setViewData();
+                    next();
                 } else {
-//                  Toast.
+                    showMessage(view, true);
                 }
-
                 break;
             case R.id.iv_play_bar_previous://上一曲
-                previous();
                 if (currentPosition > 0) {
                     currentPosition--;
-                    setViewData();
+                    previous();
                 } else {
-//                    Toast.makeText("已经是第一首啦", Toast.LENGTH_SHORT).show();
+                    showMessage(view, false);
                 }
                 break;
             case R.id.fl_play_bar:
@@ -229,6 +233,29 @@ public class MusicListActivity extends BaseActivity implements ExpandableListVie
         }
     }
 
+    /**
+     * 播放
+     */
+    private void play() {
+        getPlayService().playPause();
+    }
+
+    /**
+     * @param isNext 是否是上一曲
+     */
+    private void showMessage(View view, boolean isNext) {
+        String str;
+        if (isNext) {
+            str = getResources().getString(R.string.is_last_music);
+        } else {
+            str = getResources().getString(R.string.is_first_music);
+        }
+        Snackbar.make(view, str, Snackbar.LENGTH_SHORT).show();
+    }
+
+    /***
+     * 弹出playfragmet
+     */
     private void showPlayingFragment() {
         FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
         ft.setCustomAnimations(R.anim.fragment_slide_up, 0);
@@ -242,12 +269,19 @@ public class MusicListActivity extends BaseActivity implements ExpandableListVie
         isPlayFragmentShow = true;
     }
 
+    /***
+     * 隐藏playfragmet
+     */
     private void hidePlayingFragment() {
         FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
         ft.setCustomAnimations(0, R.anim.fragment_slide_down);
         ft.hide(mPlayFragment);
         ft.commit();
         isPlayFragmentShow = false;
+        if (mPlayService != null) {//更新view
+            currentPosition = mPlayService.getPlayingPosition();
+            setViewData();
+        }
     }
 
     public void onPlayerResume() {
@@ -272,6 +306,9 @@ public class MusicListActivity extends BaseActivity implements ExpandableListVie
         return false;
     }
 
+    /**
+     * 更新view
+     */
     private void setViewData() {
         MusicInfo music = musicList.get(currentPosition);
         tvPlayBarTitle.setText(music.getTitle());
@@ -297,12 +334,34 @@ public class MusicListActivity extends BaseActivity implements ExpandableListVie
         }
     }
 
+    /**
+     * 更新进度条时间
+     *
+     * @param remain
+     */
     @Override
     public void onTimer(long remain) {
         if (timerItem == null) {
         }
         String title = getString(R.string.menu_timer);
         timerItem.setTitle(remain == 0 ? title : SystemUtils.formatTime(title + "(mm:ss)", remain));
+    }
+
+    /**
+     * 开始播放
+     *
+     * @param music
+     */
+    public void onPlay(MusicInfo music) {
+        if (music == null) {
+            return;
+        }
+        setViewData();
+        if (getPlayService().isPlaying()) {
+            ivPlayBarPlay.setSelected(true);
+        } else {
+            ivPlayBarPlay.setSelected(false);
+        }
     }
 
     /**
@@ -315,18 +374,33 @@ public class MusicListActivity extends BaseActivity implements ExpandableListVie
         }
     }
 
+    /**
+     * 更换播放的歌曲
+     *
+     * @param music
+     */
     @Override
     public void onChange(MusicInfo music) {
+        onPlay(music);
         if (mPlayFragment != null && mPlayFragment.isResume()) {
             mPlayFragment.onChange(music);
         }
     }
 
+    /**
+     *
+     */
     @Override
     public void onPlayerPause() {
         ivPlayBarPlay.setSelected(false);
         if (mPlayFragment != null && mPlayFragment.isResume()) {
             mPlayFragment.onPlayerPause();
         }
+    }
+
+    @Override
+    protected void onDestroy() {
+        unbindService(mPlayServiceConnection);
+        super.onDestroy();
     }
 }

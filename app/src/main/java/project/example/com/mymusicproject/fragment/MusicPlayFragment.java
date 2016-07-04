@@ -115,9 +115,6 @@ public class MusicPlayFragment extends BaseFragment implements View.OnClickListe
             case R.id.iv_back:
                 onBackPressed();
                 break;
-            case R.id.iv_mode:
-                switchPlayMode();
-                break;
             case R.id.iv_play:
                 play();
                 break;

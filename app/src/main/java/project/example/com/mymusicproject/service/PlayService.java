@@ -30,7 +30,6 @@ import project.example.com.mymusicproject.util.Preferences;
  ***/
 
 public class PlayService extends Service implements MediaPlayer.OnCompletionListener, AudioManager.OnAudioFocusChangeListener {
-    private static final int NOTIFICATION_ID = 0x111;
     private static final long TIME_UPDATE = 100L;
     private static final List<BaseActivity> sActivityStack = new ArrayList<>();
     // 本地歌曲列表
@@ -64,7 +63,6 @@ public class PlayService extends Service implements MediaPlayer.OnCompletionList
                 }
                 mHandler.postDelayed(this, DateUtils.SECOND_IN_MILLIS);
             } else {
-//                SystemUtils.clearStack(sActivityStack);
                 stop();
             }
         }
@@ -124,7 +122,6 @@ public class PlayService extends Service implements MediaPlayer.OnCompletionList
         if (getMusicList().isEmpty()) {
             return;
         }
-        updatePlayingPosition();
         mPlayingMusic = mPlayingMusic == null ? getMusicList().get(mPlayingPosition) : mPlayingMusic;
     }
 
@@ -162,21 +159,6 @@ public class PlayService extends Service implements MediaPlayer.OnCompletionList
         }
         Preferences.saveCurrentSongId(mPlayingMusic.getId());
         return mPlayingPosition;
-    }
-
-    public void play(MusicInfo music) {
-        mPlayingMusic = music;
-        try {
-            mPlayer.reset();
-            mPlayer.setDataSource(mPlayingMusic.getUrl());
-            mPlayer.prepare();
-            start();
-            if (mListener != null) {
-                mListener.onChange(mPlayingMusic);
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
     }
 
     public void playPause() {
@@ -287,22 +269,6 @@ public class PlayService extends Service implements MediaPlayer.OnCompletionList
         return mPlayingMusic;
     }
 
-    /**
-     * 删除或下载歌曲后刷新正在播放的本地歌曲的序号
-     */
-    public void updatePlayingPosition() {
-        int position = 0;
-        long id = Preferences.getCurrentSongId();
-        for (int i = 0; i < getMusicList().size(); i++) {
-            if (getMusicList().get(i).getId() == id) {
-                position = i;
-                break;
-            }
-        }
-        mPlayingPosition = position;
-        Preferences.saveCurrentSongId(getMusicList().get(mPlayingPosition).getId());
-    }
-
     @Override
     public void onAudioFocusChange(int focusChange) {
         switch (focusChange) {
@@ -316,18 +282,6 @@ public class PlayService extends Service implements MediaPlayer.OnCompletionList
         }
     }
 
-    public void startQuitTimer(long milli) {
-        stopQuitTimer();
-        if (milli > 0) {
-            quitTimerRemain = milli + DateUtils.SECOND_IN_MILLIS;
-            mHandler.post(mQuitRunnable);
-        } else {
-            quitTimerRemain = 0;
-            if (mListener != null) {
-                mListener.onTimer(quitTimerRemain);
-            }
-        }
-    }
 
     private void stopQuitTimer() {
         mHandler.removeCallbacks(mQuitRunnable);

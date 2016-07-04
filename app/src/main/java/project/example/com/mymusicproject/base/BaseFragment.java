@@ -12,9 +12,12 @@ import project.example.com.mymusicproject.page.MusicListActivity;
 import project.example.com.mymusicproject.service.PlayService;
 
 /**
- * 基类
- * Created by wcy on 2015/11/26.
- */
+ * fragment 基类
+ *
+ * @auther ccc
+ * created at  17:37
+ ***/
+
 public abstract class BaseFragment extends Fragment {
     private PlayService mPlayService;
     protected Handler mHandler;

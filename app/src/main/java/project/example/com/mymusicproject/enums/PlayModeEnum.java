@@ -5,9 +5,9 @@ package project.example.com.mymusicproject.enums;
  * Created by wcy on 2015/12/26.
  */
 public enum PlayModeEnum {
-    LOOP(0),
-    SHUFFLE(1),
-    ONE(2);
+    LOOP(0),//
+    SHUFFLE(1),//
+    ONE(2);//
 
     private int value;
 
