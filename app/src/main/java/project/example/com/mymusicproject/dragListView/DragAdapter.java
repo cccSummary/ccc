@@ -18,21 +18,16 @@ import butterknife.ButterKnife;
 import project.example.com.mymusicproject.R;
 import project.example.com.mymusicproject.loader.PictureLoader;
 import project.example.com.mymusicproject.model.MusicInfo;
-import project.example.com.mymusicproject.service.PlayService;
 
 /**
+ * 展开列表adapter
  * Created by CongCong on 6/22/16.
  */
 public class DragAdapter extends BaseExpandableListAdapter {
-
-    private int selectedGroup;
-    private int selectedChild;
     private Context mContext;
     private LayoutInflater mInflater;
-    private ArrayList<String> groups;
     private Map<String, ArrayList<MusicInfo>> children;
     private List<String> group_list;
-    private int mPlayingPosition;
 
     public DragAdapter(Context context, List<String> group_list, Map<String, ArrayList<MusicInfo>> children) {
         this.mContext = context;
@@ -42,8 +37,8 @@ public class DragAdapter extends BaseExpandableListAdapter {
     }
 
     public void onPick(int[] position) {
-        selectedGroup = position[0];
-        selectedChild = position[1];
+//        selectedGroup = position[0];
+//        selectedChild = position[1];
     }
 
 
@@ -70,8 +65,6 @@ public class DragAdapter extends BaseExpandableListAdapter {
         MusicInfo tValue = getValue(from);
         children.get(children.keySet().toArray()[from[0]]).remove(tValue);
         children.get(children.keySet().toArray()[to[0]]).add(to[1], tValue);
-        selectedGroup = -1;
-        selectedChild = -1;
         notifyDataSetChanged();
     }
 
@@ -93,7 +86,6 @@ public class DragAdapter extends BaseExpandableListAdapter {
     @Override
     public View getChildView(int groupPosition, int childPosition,
                              boolean isLastChild, View convertView, ViewGroup parent) {
-
         ViewHolder itemHolder;
         if (convertView == null) {
             convertView = mInflater.inflate(R.layout.music_item, null);
@@ -102,20 +94,13 @@ public class DragAdapter extends BaseExpandableListAdapter {
         } else {
             itemHolder = (ViewHolder) convertView.getTag();
         }
-        mPlayingPosition = childPosition;
         MusicInfo music = (MusicInfo) getChild(groupPosition, childPosition);
-        //1.是否载入默认 2.是否小图
-//        ImageLoader.getInstance().displayImage(music.getAlbum(), itemHolder.ivCover, R.drawable.default_cover);
         Bitmap cover = PictureLoader.getArtwork(mContext, music.getId(), music.getAlbumId(), true, false);
         if (cover == null) {
             itemHolder.ivCover.setImageResource(R.drawable.default_cover);
         } else {
             itemHolder.ivCover.setImageBitmap(cover);
         }
-//
-////        //1.是否载入默认 2.是否小图
-////        Bitmap bm = PictureLoader.getArtwork(mContext, music.getId(), music.getAlbumId(), true, false);
-
         itemHolder.tvTitle.setText(music.getTitle());
         itemHolder.tvArtist.setText(music.getArtist());
         return convertView;
@@ -167,18 +152,5 @@ public class DragAdapter extends BaseExpandableListAdapter {
     @Override
     public boolean isChildSelectable(int groupPosition, int childPosition) {
         return true;
-    }
-
-    /**
-     * 更新播放位置
-     *
-     * @param playService
-     */
-    public void updatePlayingPosition(PlayService playService) {
-        if (playService.getPlayingMusic() != null) {
-            mPlayingPosition = playService.getPlayingPosition();
-        } else {
-            mPlayingPosition = -1;
-        }
     }
 }

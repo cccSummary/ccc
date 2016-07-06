@@ -35,7 +35,7 @@ import project.example.com.mymusicproject.loader.PictureLoader;
 import project.example.com.mymusicproject.model.MusicInfo;
 import project.example.com.mymusicproject.service.OnPlayerEventListener;
 import project.example.com.mymusicproject.service.PlayService;
-import project.example.com.mymusicproject.util.SystemUtils;
+import project.example.com.mymusicproject.util.FileUtils;
 
 /**
  * Created by Administrator on 2016/6/21.
@@ -162,7 +162,6 @@ public class MusicListActivity extends BaseActivity implements ExpandableListVie
         expendlist.setDragOnLongPress(true);
         DragAdapter mAdapter = new DragAdapter(this, group_list, children);
         expendlist.setAdapter(mAdapter);
-        mAdapter.updatePlayingPosition(mPlayService);
         int groupCount = expendlist.getCount();//默认列表展开
         for (int i = 0; i < groupCount; i++) {
             expendlist.expandGroup(i);
@@ -284,8 +283,12 @@ public class MusicListActivity extends BaseActivity implements ExpandableListVie
         }
     }
 
+    @Override
     public void onPlayerResume() {
         ivPlayBarPlay.setSelected(true);
+        if (mPlayFragment != null && mPlayFragment.isResume()) {
+            mPlayFragment.onPlayerResume();
+        }
     }
 
     /**
@@ -344,7 +347,7 @@ public class MusicListActivity extends BaseActivity implements ExpandableListVie
         if (timerItem == null) {
         }
         String title = getString(R.string.menu_timer);
-        timerItem.setTitle(remain == 0 ? title : SystemUtils.formatTime(title + "(mm:ss)", remain));
+        timerItem.setTitle(remain == 0 ? title : FileUtils.formatTime(title + "(mm:ss)", remain));
     }
 
     /**

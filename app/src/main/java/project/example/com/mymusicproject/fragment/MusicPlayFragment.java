@@ -4,6 +4,7 @@ import android.graphics.Bitmap;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.support.v4.view.ViewPager;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -12,47 +13,93 @@ import android.widget.LinearLayout;
 import android.widget.SeekBar;
 import android.widget.TextView;
 
+import java.io.File;
+import java.util.ArrayList;
+import java.util.List;
+
 import butterknife.Bind;
 import project.example.com.mymusicproject.R;
 import project.example.com.mymusicproject.base.BaseFragment;
-import project.example.com.mymusicproject.enums.PlayModeEnum;
+import project.example.com.mymusicproject.dragListView.PlayPagerAdapter;
 import project.example.com.mymusicproject.loader.PictureLoader;
 import project.example.com.mymusicproject.model.MusicInfo;
-import project.example.com.mymusicproject.util.Preferences;
+import project.example.com.mymusicproject.net.DownLoadLrc;
+import project.example.com.mymusicproject.util.FileUtils;
+import project.example.com.mymusicproject.util.IndicatorLayout;
+import project.example.com.mymusicproject.util.LrcView;
 import project.example.com.mymusicproject.util.ScreenUtils;
-import project.example.com.mymusicproject.util.SystemUtils;
 
 /**
  * @auther ccc
  * created at 2016/7/4 9:40
  ***/
 
-public class MusicPlayFragment extends BaseFragment implements View.OnClickListener, SeekBar.OnSeekBarChangeListener {
+public class MusicPlayFragment extends BaseFragment implements View.OnClickListener, ViewPager.OnPageChangeListener, SeekBar.OnSeekBarChangeListener {
     @Bind(R.id.ll_content)
     LinearLayout llContent;
+    /**
+     * 返回按钮
+     **/
     @Bind(R.id.iv_back)
     ImageView ivBack;
+    /**
+     * 歌曲名称
+     **/
     @Bind(R.id.tv_title)
     TextView tvTitle;
+    /**
+     * 歌曲作者
+     **/
     @Bind(R.id.tv_artist)
     TextView tvArtist;
+    /**
+     * 进度条
+     **/
     @Bind(R.id.sb_progress)
     SeekBar sbProgress;
+    /**
+     * 播放时常
+     **/
     @Bind(R.id.tv_current_time)
     TextView tvCurrentTime;
+    /**
+     * 总时长
+     **/
     @Bind(R.id.tv_total_time)
     TextView tvTotalTime;
-    //    @Bind(R.id.iv_mode)
-//    ImageView ivMode;
+    /**
+     * 播放按钮
+     **/
     @Bind(R.id.iv_play)
     ImageView ivPlay;
+    /**
+     * 下一曲
+     **/
     @Bind(R.id.iv_next)
     ImageView ivNext;
+    /**
+     * 上一曲
+     **/
     @Bind(R.id.iv_prev)
     ImageView ivPrev;
-    @Bind(R.id.iv_music_cover)
+    /**
+     * 封面图
+     **/
     ImageView mAlbumCoverView;
     private int mLastProgress;
+    @Bind(R.id.vp_play_page)
+    ViewPager vpPlay;
+    @Bind(R.id.il_indicator)
+    IndicatorLayout ilIndicator;
+    private List<View> mViewPagerContent;
+    /**
+     * 单行歌词
+     **/
+    private LrcView mLrcViewSingle;
+    /**
+     * 总歌词
+     **/
+    private LrcView mLrcViewFull;
 
     @Nullable
     @Override
@@ -63,8 +110,24 @@ public class MusicPlayFragment extends BaseFragment implements View.OnClickListe
     @Override
     protected void init() {
         initSystemBar();
-        initPlayMode();
+        initViewPager();
+        ilIndicator.create(mViewPagerContent.size());
         onChange(getPlayService().getPlayingMusic());
+    }
+
+    /**
+     * 初始化ViewPager
+     **/
+    private void initViewPager() {
+        View coverView = LayoutInflater.from(getActivity()).inflate(R.layout.fragment_play_page_cover, null);
+        View lrcView = LayoutInflater.from(getActivity()).inflate(R.layout.fragment_play_page_lrc, null);
+        mAlbumCoverView = (ImageView) coverView.findViewById(R.id.iv_music_cover);
+        mLrcViewSingle = (LrcView) coverView.findViewById(R.id.lrc_view_single);
+        mLrcViewFull = (LrcView) lrcView.findViewById(R.id.lrc_view_full);
+        mViewPagerContent = new ArrayList<>(2);
+        mViewPagerContent.add(coverView);
+        mViewPagerContent.add(lrcView);
+        vpPlay.setAdapter(new PlayPagerAdapter(mViewPagerContent));
     }
 
     @Override
@@ -75,7 +138,6 @@ public class MusicPlayFragment extends BaseFragment implements View.OnClickListe
     @Override
     protected void setListener() {
         ivBack.setOnClickListener(this);
-//        ivMode.setOnClickListener(this);
         ivPlay.setOnClickListener(this);
         ivPrev.setOnClickListener(this);
         ivNext.setOnClickListener(this);
@@ -92,15 +154,16 @@ public class MusicPlayFragment extends BaseFragment implements View.OnClickListe
         }
     }
 
-    private void initPlayMode() {
-        int mode = Preferences.getPlayMode();
-//        ivMode.setImageLevel(mode);
-    }
-
+    /**
+     * 更改播放的歌曲
+     **/
     public void onChange(MusicInfo music) {
         onPlay(music);
     }
 
+    /**
+     * 播放和暂停
+     **/
     public void onPlayerPause() {
         ivPlay.setSelected(false);
     }
@@ -149,12 +212,15 @@ public class MusicPlayFragment extends BaseFragment implements View.OnClickListe
         }
     }
 
-
+    /**
+     * 底部栏 点击播放按钮
+     **/
     private void onPlay(MusicInfo music) {
         if (music == null) {
             return;
         }
         setViewData(music);
+        setLrc(music);
         sbProgress.setMax((int) music.getDuration());
         sbProgress.setProgress(0);
         mLastProgress = 0;
@@ -167,6 +233,62 @@ public class MusicPlayFragment extends BaseFragment implements View.OnClickListe
         }
     }
 
+    /**
+     * 加载歌词
+     **/
+    private void setLrc(final MusicInfo music) {
+        String lrcPath = FileUtils.getLrcFilePath(music);
+        if (new File(lrcPath).exists()) {//判断歌词是否已经存在，存在的话直接加载否则去下载
+            loadLrc(lrcPath);
+        } else {
+            new DownLoadLrc(music.getArtist(), music.getTitle()) {
+                @Override
+                public void onPrepare() {
+                    mLrcViewSingle.searchLrc();
+                    mLrcViewFull.searchLrc();
+                    // 设置tag防止歌词下载完成后已切换歌曲
+                    mLrcViewSingle.setTag(music);
+                }
+
+                @Override
+                public void onFinish(@Nullable String lrcPath) {
+                    if (mLrcViewSingle.getTag() == music) {
+                        loadLrc(lrcPath);
+                    }
+                }
+            }.execute();
+        }
+    }
+
+
+    /**
+     * 直接加载歌词
+     *
+     * @param path
+     */
+    private void loadLrc(String path) {
+        mLrcViewSingle.loadLrc(path);
+        mLrcViewFull.loadLrc(path);
+        // 清除tag
+        mLrcViewSingle.setTag(null);
+    }
+
+    @Override
+    public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
+    }
+
+    @Override
+    public void onPageSelected(int position) {
+        ilIndicator.setCurrent(position);
+    }
+
+    @Override
+    public void onPageScrollStateChanged(int state) {
+    }
+
+    /**
+     * 更新View
+     **/
     private void setViewData(MusicInfo music) {
         tvTitle.setText(music.getTitle());
         tvArtist.setText(music.getArtist());
@@ -191,23 +313,6 @@ public class MusicPlayFragment extends BaseFragment implements View.OnClickListe
         getPlayService().prev();
     }
 
-    private void switchPlayMode() {
-        PlayModeEnum mode = PlayModeEnum.valueOf(Preferences.getPlayMode());
-        switch (mode) {
-            case LOOP:
-                mode = PlayModeEnum.SHUFFLE;
-                break;
-            case SHUFFLE:
-                mode = PlayModeEnum.ONE;
-                break;
-            case ONE:
-                mode = PlayModeEnum.LOOP;
-                break;
-        }
-        Preferences.savePlayMode(mode.value());
-        initPlayMode();
-    }
-
     private void onBackPressed() {
         getActivity().onBackPressed();
         ivBack.setEnabled(false);
@@ -220,7 +325,7 @@ public class MusicPlayFragment extends BaseFragment implements View.OnClickListe
     }
 
     private String formatTime(long time) {
-        return SystemUtils.formatTime("mm:ss", time);
+        return FileUtils.formatTime("mm:ss", time);
     }
 
     @Override
@@ -238,6 +343,8 @@ public class MusicPlayFragment extends BaseFragment implements View.OnClickListe
         if (progress - mLastProgress >= 1000) {
             tvCurrentTime.setText(formatTime(progress));
             mLastProgress = progress;
+            mLrcViewSingle.updateTime(progress);
+            mLrcViewFull.updateTime(progress);
         }
     }
 }

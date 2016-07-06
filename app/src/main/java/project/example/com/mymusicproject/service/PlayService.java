@@ -125,6 +125,9 @@ public class PlayService extends Service implements MediaPlayer.OnCompletionList
         mPlayingMusic = mPlayingMusic == null ? getMusicList().get(mPlayingPosition) : mPlayingMusic;
     }
 
+    /**
+     * 顺序播放
+     **/
     @Override
     public void onCompletion(MediaPlayer mp) {
         next();
@@ -134,6 +137,9 @@ public class PlayService extends Service implements MediaPlayer.OnCompletionList
         mListener = listener;
     }
 
+    /**
+     * 点击播放
+     **/
     public int play(int position) {
         if (getMusicList().isEmpty()) {
             return -1;
@@ -161,6 +167,9 @@ public class PlayService extends Service implements MediaPlayer.OnCompletionList
         return mPlayingPosition;
     }
 
+    /**
+     * 暂停和播放按钮
+     **/
     public void playPause() {
         if (isPlaying()) {
             pause();
@@ -178,6 +187,9 @@ public class PlayService extends Service implements MediaPlayer.OnCompletionList
         mAudioManager.requestAudioFocus(this, AudioManager.STREAM_MUSIC, AudioManager.AUDIOFOCUS_GAIN);
     }
 
+    /**
+     * 暂停
+     **/
     public int pause() {
         if (!isPlaying()) {
             return -1;
@@ -203,6 +215,9 @@ public class PlayService extends Service implements MediaPlayer.OnCompletionList
         return mPlayingPosition;
     }
 
+    /**
+     * 下一曲
+     **/
     public int next() {
         PlayModeEnum mode = PlayModeEnum.valueOf(Preferences.getPlayMode());
         switch (mode) {
@@ -218,6 +233,9 @@ public class PlayService extends Service implements MediaPlayer.OnCompletionList
         }
     }
 
+    /**
+     * 上一曲
+     **/
     public int prev() {
         PlayModeEnum mode = PlayModeEnum.valueOf(Preferences.getPlayMode());
         switch (mode) {

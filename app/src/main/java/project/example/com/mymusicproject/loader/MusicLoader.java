@@ -88,13 +88,12 @@ public class MusicLoader {
     }
 
 
-
     //下面是自定义的一个MusicInfo子类，实现了Parcelable，为的是可以将整个MusicInfo的ArrayList在Activity和Service中传送，=_=!!,但其实不用
-    public List<MusicInfo> getMusicList(){
+    public List<MusicInfo> getMusicList() {
         return musicList;
     }
 
-    public Uri getMusicUriById(long id){
+    public Uri getMusicUriById(long id) {
         return ContentUris.withAppendedId(contentUri, id);
     }
 

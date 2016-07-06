@@ -2,6 +2,8 @@ package project.example.com.mymusicproject.model;
 
 import java.io.Serializable;
 
+import project.example.com.mymusicproject.Constants;
+
 /**
  * Created by Administrator on 2016/6/21.
  * 实体bean
@@ -15,7 +17,45 @@ public class MusicInfo implements Serializable {
     private long size;
     private String artist;
     private String url;
-    private  boolean isSelect;//是否播放
+    private boolean isSelect;//是否播放
+
+    public String getFileName() {
+        return fileName;
+    }
+
+    public void setFileName() {
+        this.fileName = title + Constants.FILENAME_MP3;
+    }
+
+    // 文件名
+    private String fileName;
+
+    public Type getType() {
+        return type;
+    }
+
+    public void setType(Type type) {
+        this.type = type;
+    }
+
+    // 歌曲类型 本地/网络
+    private Type type;
+
+    /**
+     * 对比本地歌曲是否相同
+     */
+    @Override
+    public boolean equals(Object o) {
+        if (!(o instanceof MusicInfo)) {
+            return false;
+        }
+        return this.getId() == ((MusicInfo) o).getId();
+    }
+
+    public enum Type {
+        LOCAL,
+        ONLINE
+    }
 
     public void setSelect(boolean select) {
         isSelect = select;
@@ -25,11 +65,11 @@ public class MusicInfo implements Serializable {
         return isSelect;
     }
 
-    public MusicInfo(){
+    public MusicInfo() {
 
     }
 
-    public MusicInfo(long pId, String pTitle){
+    public MusicInfo(long pId, String pTitle) {
         id = pId;
         title = pTitle;
     }
@@ -98,47 +138,4 @@ public class MusicInfo implements Serializable {
     public void setUrl(String url) {
         this.url = url;
     }
-//
-//    @Override
-//    public int describeContents() {
-//        return 0;
-//    }
-
-//    @Override
-//    public void writeToParcel(Parcel dest, int flags) {
-//        dest.writeLong(id);
-//        dest.writeString(title);
-//        dest.writeString(album);
-//        dest.writeLong(albumId);
-//        dest.writeString(artist);
-//        dest.writeString(url);
-//        dest.writeInt(duration);
-//        dest.writeLong(size);
-//        Log.v("","shit"+albumId);
-//
-//    }
-//
-//    public static final Creator<MusicInfo>
-//            CREATOR = new Creator<MusicInfo>() {
-//
-//        @Override
-//        public MusicInfo[] newArray(int size) {
-//            return new MusicInfo[size];
-//        }
-//
-//        @Override
-//        public MusicInfo createFromParcel(Parcel source) {
-//            MusicInfo musicInfo = new MusicInfo();
-//            musicInfo.setId(source.readLong());
-//            musicInfo.setTitle(source.readString());
-//            musicInfo.setAlbum(source.readString());
-//            musicInfo.setAlbumId(source.readLong());
-//            musicInfo.setArtist(source.readString());
-//            musicInfo.setUrl(source.readString());
-//            musicInfo.setDuration(source.readInt());
-//            musicInfo.setSize(source.readLong());
-//            return musicInfo;
-//
-//        }
-//    };
 }

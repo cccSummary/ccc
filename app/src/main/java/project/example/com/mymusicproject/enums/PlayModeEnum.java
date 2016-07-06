@@ -2,10 +2,9 @@ package project.example.com.mymusicproject.enums;
 
 /**
  * 播放模式
- * Created by wcy on 2015/12/26.
  */
 public enum PlayModeEnum {
-    LOOP(0),//
+    LOOP(0),//列表循环
     SHUFFLE(1),//
     ONE(2);//
 
