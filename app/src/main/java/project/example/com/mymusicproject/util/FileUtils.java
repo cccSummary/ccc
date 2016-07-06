@@ -27,19 +27,14 @@ public class FileUtils {
         return mkdirs(dir);
     }
 
-
-    public static String getRelativeMusicDir() {
-        String dir = "PonyMusic/Music/";
-        return mkdirs(dir);
-    }
-
     /**
      * 获取歌词路径
      * 先从已下载文件夹中查找，如果不存在，则从歌曲文件所在文件夹查找
      */
     public static String getLrcFilePath(MusicInfo music) {
-        String lrcFilePath = getLrcDir() + music.getTitle() + Constants.FILENAME_LRC;
-        if (!new File(lrcFilePath).exists()) {
+        String lrcFilePath  =getLrcDir() + FileUtils.getLrcFileName(music.getArtist(), music.getTitle());
+//        String lrcFilePath = getLrcDir() + music.getTitle() + Constants.FILENAME_LRC;
+        if (fileIsExists(lrcFilePath)) {//判断文件是否存在
             lrcFilePath = music.getUrl().replace(Constants.FILENAME_MP3, Constants.FILENAME_LRC);
         }
         return lrcFilePath;
@@ -74,7 +69,7 @@ public class FileUtils {
         if (TextUtils.isEmpty(title)) {
             title = MusicApplication.getInstance().getString(R.string.unknown);
         }
-        return artist + " - " + title + Constants.FILENAME_LRC;
+        return artist+"-"+title + Constants.FILENAME_LRC;
     }
 
     /**
@@ -113,5 +108,26 @@ public class FileUtils {
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }
+
+    /***
+     * 判断文件是否存在
+     *
+     * @param strFile
+     * @return
+     */
+
+    public static boolean fileIsExists(String strFile) {
+        try {
+            File f = new File(strFile);
+            if (!f.exists()) {
+                return false;
+            }
+
+        } catch (Exception e) {
+            return false;
+        }
+
+        return true;
     }
 }

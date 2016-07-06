@@ -3,6 +3,10 @@ package project.example.com.mymusicproject;
 import android.app.Application;
 import android.content.res.Resources;
 
+import com.zhy.http.okhttp.OkHttpUtils;
+
+import java.util.concurrent.TimeUnit;
+
 import project.example.com.mymusicproject.util.Preferences;
 
 /**
@@ -20,10 +24,19 @@ public class MusicApplication extends Application {
         sInstance = this;
         sRes = getResources();
         Preferences.init(this);
+        initOkHttpUtils();
     }
 
     public static MusicApplication getInstance() {
         return sInstance;
     }
 
+    /***
+     * 配置okhtpp
+     */
+    private void initOkHttpUtils() {
+        OkHttpUtils.getInstance().setConnectTimeout(30, TimeUnit.SECONDS);
+        OkHttpUtils.getInstance().setReadTimeout(30, TimeUnit.SECONDS);
+        OkHttpUtils.getInstance().setWriteTimeout(30, TimeUnit.SECONDS);
+    }
 }
