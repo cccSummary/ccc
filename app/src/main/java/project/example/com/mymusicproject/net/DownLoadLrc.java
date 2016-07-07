@@ -10,7 +10,7 @@ import okhttp3.Call;
 import project.example.com.mymusicproject.Constants;
 import project.example.com.mymusicproject.callback.JsonCallback;
 import project.example.com.mymusicproject.model.LrcData;
-import project.example.com.mymusicproject.model.SearchMusic;
+import project.example.com.mymusicproject.model.MusicData;
 import project.example.com.mymusicproject.util.FileUtils;
 
 /**
@@ -20,12 +20,9 @@ public abstract class DownLoadLrc {
     private String artist;
     private String title;
 
-    private long musicId;
-
     public DownLoadLrc(String artist, String title) {
         this.artist = artist;
         this.title = title;
-        this.musicId = musicId;
     }
 
     public void execute() {
@@ -37,13 +34,37 @@ public abstract class DownLoadLrc {
      * 先搜索歌曲，从而获得songid，用的是百度音乐api
      **/
     private void searchLrc() {
+//        OkHttpUtils.get().url("http://music.163.com/search/get/").
+//                addHeader("appver", "2.0.2").
+//                addParams("s", title).
+//                addParams("type", "1").
+//                addParams("limit", "10").
+//                addParams("offset", "0").
+//                build().
+//                execute(new JsonCallback<SearchData>(SearchData.class) {
+//                            @Override
+//                            public void onError(Call call, Exception e) {
+//
+//                            }
+//
+//                            @Override
+//                            public void onResponse(SearchData response) {
+//                                if (response == null || response.getSongs() == null) {
+//                                    onFinish(null);
+//                                    return;
+//                                }
+//                                String songID = String.valueOf(response.getSongs().get(0).getId());//
+//                                downloadLrc(songID);
+//                            }
+//                        }
+//                );
         OkHttpUtils.get().url(Constants.BASE_URL)
                 .addParams(Constants.PARAM_METHOD, Constants.METHOD_SEARCH_MUSIC)
-                .addParams(Constants.PARAM_QUERY, title)
+                .addParams(Constants.PARAM_QUERY, title+"-"+artist)
                 .build()
-                .execute(new JsonCallback<SearchMusic>(SearchMusic.class) {//此接口返回的是一个列表，所以取第一个歌的id
+                .execute(new JsonCallback<MusicData>(MusicData.class) {//此接口返回的是一个列表，所以取第一个歌的id
                     @Override
-                    public void onResponse(SearchMusic response) {
+                    public void onResponse(MusicData response) {
                         if (response == null || response.getSong() == null) {
                             onFinish(null);
                             return;
@@ -62,6 +83,7 @@ public abstract class DownLoadLrc {
     /**
      * 得到songid后 然后去请求得到歌词
      **/
+
     private void downloadLrc(String songId) {
         OkHttpUtils.get().url(Constants.BASE_URL)
                 .addParams(Constants.PARAM_METHOD, Constants.METHOD_LRC)

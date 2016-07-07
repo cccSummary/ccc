@@ -95,6 +95,8 @@ public class MusicListActivity extends BaseActivity implements ExpandableListVie
     private PlayService mPlayService;
     private boolean isPlayFragmentShow = false;
     private MenuItem timerItem;
+    @Bind(R.id.tv_local_music)
+    TextView titleBarText;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -178,6 +180,7 @@ public class MusicListActivity extends BaseActivity implements ExpandableListVie
         ivPlayBarPlay.setOnClickListener(this);
         ivPlayBarPreious.setOnClickListener(this);
         flPlayBar.setOnClickListener(this);
+        titleBarText.setOnClickListener(this);
     }
 
     /**
@@ -228,6 +231,9 @@ public class MusicListActivity extends BaseActivity implements ExpandableListVie
                 break;
             case R.id.fl_play_bar:
                 showPlayingFragment();
+                break;
+            case R.id.tv_local_music:
+                startActivity(new Intent(this, OnLineMusicActivity.class));
                 break;
         }
     }

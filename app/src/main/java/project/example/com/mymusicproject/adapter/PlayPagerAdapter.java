@@ -1,4 +1,4 @@
-package project.example.com.mymusicproject.dragListView;
+package project.example.com.mymusicproject.adapter;
 
 import android.support.v4.view.PagerAdapter;
 import android.view.View;

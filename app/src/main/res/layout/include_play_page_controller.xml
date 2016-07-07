@@ -18,7 +18,7 @@
             android:layout_height="wrap_content"
             android:text="@string/play_time_start"
             android:textColor="@color/white"
-            android:textSize="10sp" />
+            android:textSize="12sp" />
 
         <SeekBar
             android:id="@+id/sb_progress"
@@ -39,7 +39,7 @@
             android:layout_height="wrap_content"
             android:text="@string/play_time_start"
             android:textColor="@color/translucent_white"
-            android:textSize="10sp" />
+            android:textSize="12sp" />
     </LinearLayout>
 
     <LinearLayout

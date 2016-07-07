@@ -8,7 +8,6 @@
     <!-- 震动 -->
     <uses-permission android:name="android.permission.VIBRATE" />
 
-    <!--屏幕晃动-->
     <uses-permission android:name="android.permission.LOCATION" />
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
     <uses-permission android:name="android.permission.INTERNET" />
@@ -25,9 +24,8 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
         <activity
-            android:name=".page.MusicListActivity"
+            android:name=".page.MainMusicActivity"
             android:label="@string/app_name">
-
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
@@ -35,6 +33,11 @@
         </activity>
 
         <service android:name=".service.PlayService" />
+        <activity
+            android:name=".page.OnLineMusicActivity"
+            android:label="@string/online_music"
+            android:launchMode="singleTask"
+            android:screenOrientation="portrait" />
     </application>
 
 </manifest>

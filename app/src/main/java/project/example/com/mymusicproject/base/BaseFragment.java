@@ -8,7 +8,7 @@ import android.support.v4.app.Fragment;
 import android.view.View;
 
 import butterknife.ButterKnife;
-import project.example.com.mymusicproject.page.MusicListActivity;
+import project.example.com.mymusicproject.page.MainMusicActivity;
 import project.example.com.mymusicproject.service.PlayService;
 
 /**
@@ -32,8 +32,8 @@ public abstract class BaseFragment extends Fragment {
     @Override
     public void onAttach(Activity activity) {
         super.onAttach(activity);
-        if (activity instanceof MusicListActivity) {
-            mPlayService = ((MusicListActivity) activity).getPlayService();
+        if (activity instanceof MainMusicActivity) {
+            mPlayService = ((MainMusicActivity) activity).getPlayService();
         }
     }
 

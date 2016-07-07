@@ -32,9 +32,8 @@ public class FileUtils {
      * 先从已下载文件夹中查找，如果不存在，则从歌曲文件所在文件夹查找
      */
     public static String getLrcFilePath(MusicInfo music) {
-        String lrcFilePath  =getLrcDir() + FileUtils.getLrcFileName(music.getArtist(), music.getTitle());
-//        String lrcFilePath = getLrcDir() + music.getTitle() + Constants.FILENAME_LRC;
-        if (fileIsExists(lrcFilePath)) {//判断文件是否存在
+        String lrcFilePath = getLrcDir() + FileUtils.getLrcFileName(music.getArtist(), music.getTitle());//歌词的存放地址
+        if (!new File(lrcFilePath).exists()) {//判断文件是否存在
             lrcFilePath = music.getUrl().replace(Constants.FILENAME_MP3, Constants.FILENAME_LRC);
         }
         return lrcFilePath;
@@ -48,18 +47,6 @@ public class FileUtils {
         return dir;
     }
 
-    public static String getMp3FileName(String artist, String title) {
-        artist = stringFilter(artist);
-        title = stringFilter(title);
-        if (TextUtils.isEmpty(artist)) {
-            artist = MusicApplication.getInstance().getString(R.string.unknown);
-        }
-        if (TextUtils.isEmpty(title)) {
-            title = MusicApplication.getInstance().getString(R.string.unknown);
-        }
-        return artist + " - " + title + Constants.FILENAME_MP3;
-    }
-
     public static String getLrcFileName(String artist, String title) {
         artist = stringFilter(artist);
         title = stringFilter(title);
@@ -69,7 +56,7 @@ public class FileUtils {
         if (TextUtils.isEmpty(title)) {
             title = MusicApplication.getInstance().getString(R.string.unknown);
         }
-        return artist+"-"+title + Constants.FILENAME_LRC;
+        return artist + "-" + title + Constants.FILENAME_LRC;
     }
 
     /**
@@ -110,24 +97,23 @@ public class FileUtils {
         }
     }
 
-    /***
-     * 判断文件是否存在
-     *
-     * @param strFile
-     * @return
-     */
-
-    public static boolean fileIsExists(String strFile) {
-        try {
-            File f = new File(strFile);
-            if (!f.exists()) {
-                return false;
-            }
-
-        } catch (Exception e) {
-            return false;
-        }
-
-        return true;
-    }
+//    /***
+//     * 判断文件是否存在
+//     *
+//     * @param strFile
+//     * @return
+//     */
+//
+//    public static boolean fileIsExists(String strFile) {
+//        try {
+//            File f = new File(strFile);
+//            if (!f.exists()) {
+//                return false;
+//            }
+//        } catch (Exception e) {
+//            return false;
+//        }
+//
+//        return true;
+//    }
 }

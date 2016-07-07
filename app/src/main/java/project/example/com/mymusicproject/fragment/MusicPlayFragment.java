@@ -20,7 +20,7 @@ import java.util.List;
 import butterknife.Bind;
 import project.example.com.mymusicproject.R;
 import project.example.com.mymusicproject.base.BaseFragment;
-import project.example.com.mymusicproject.dragListView.PlayPagerAdapter;
+import project.example.com.mymusicproject.adapter.PlayPagerAdapter;
 import project.example.com.mymusicproject.loader.PictureLoader;
 import project.example.com.mymusicproject.model.MusicInfo;
 import project.example.com.mymusicproject.net.DownLoadLrc;
@@ -119,8 +119,8 @@ public class MusicPlayFragment extends BaseFragment implements View.OnClickListe
      * 初始化ViewPager
      **/
     private void initViewPager() {
-        View coverView = LayoutInflater.from(getActivity()).inflate(R.layout.fragment_play_page_cover, null);
-        View lrcView = LayoutInflater.from(getActivity()).inflate(R.layout.fragment_play_page_lrc, null);
+        View coverView = LayoutInflater.from(getActivity()).inflate(R.layout.fragment_play_page_cover, null);//封面图
+        View lrcView = LayoutInflater.from(getActivity()).inflate(R.layout.fragment_play_page_lrc, null);//歌词界面
         mAlbumCoverView = (ImageView) coverView.findViewById(R.id.iv_music_cover);
         mLrcViewSingle = (LrcView) coverView.findViewById(R.id.lrc_view_single);
         mLrcViewFull = (LrcView) lrcView.findViewById(R.id.lrc_view_full);
