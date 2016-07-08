@@ -20,6 +20,7 @@ import project.example.com.mymusicproject.base.BaseActivity;
 import project.example.com.mymusicproject.enums.PlayModeEnum;
 import project.example.com.mymusicproject.loader.MusicLoader;
 import project.example.com.mymusicproject.model.MusicInfo;
+import project.example.com.mymusicproject.model.SongListInfo;
 import project.example.com.mymusicproject.util.Preferences;
 
 /**
@@ -37,6 +38,7 @@ public class PlayService extends Service implements MediaPlayer.OnCompletionList
     private MediaPlayer mPlayer = new MediaPlayer();
     private Handler mHandler = new Handler();
     private AudioManager mAudioManager;
+    public List<SongListInfo> mSongLists = new ArrayList<>();
     private OnPlayerEventListener mListener;
     // 正在播放的歌曲
     private MusicInfo mPlayingMusic;

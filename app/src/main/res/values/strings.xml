@@ -7,4 +7,7 @@
     <string name="is_first_music">已经是第一首了</string>
     <string name="is_last_music">已经是最后一首了</string>
     <string name="unknown">未知</string>
+    <string name="song_list_item_title_1">1.%1$s - %2$s</string>
+    <string name="song_list_item_title_2">2.%1$s - %2$s</string>
+    <string name="song_list_item_title_3">3.%1$s - %2$s</string>
 </resources>
