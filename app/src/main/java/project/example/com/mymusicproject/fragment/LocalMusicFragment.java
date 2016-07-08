@@ -56,6 +56,7 @@ public class LocalMusicFragment extends BaseFragment implements ExpandableListVi
         if (getPlayService().getPlayingMusic() != null && getPlayService().getPlayingMusic().getType() == MusicInfo.Type.LOCAL) {
             lvLocalMusic.setSelection(getPlayService().getPlayingPosition());
         }
+        lvLocalMusic.setOnChildClickListener(this);
     }
 
     /**

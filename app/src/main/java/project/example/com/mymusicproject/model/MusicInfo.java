@@ -1,68 +1,31 @@
 package project.example.com.mymusicproject.model;
 
-import java.io.Serializable;
+import android.graphics.Bitmap;
 
-import project.example.com.mymusicproject.Constants;
+import java.io.Serializable;
 
 /**
  * Created by Administrator on 2016/6/21.
  * 实体bean
  */
 public class MusicInfo implements Serializable {
-    private long id;
-    private String title;
-    private String album;
-    private long albumId;
-    private int duration;
-    private long size;
-    private String artist;
-    private String url;
-    private boolean isSelect;//是否播放
-
-    public String getFileName() {
-        return fileName;
-    }
-
-    public void setFileName() {
-        this.fileName = title + Constants.FILENAME_MP3;
-    }
-
-    // 文件名
-    private String fileName;
-
-    public Type getType() {
-        return type;
-    }
-
-    public void setType(Type type) {
-        this.type = type;
-    }
-
     // 歌曲类型 本地/网络
     private Type type;
+    // [本地歌曲]歌曲id
+    private long id;
+    // 音乐标题
+    private String title;
+    // 艺术家
+    private String artist;
+    // 专辑
+    private String album;
 
-    /**
-     * 对比本地歌曲是否相同
-     */
-    @Override
-    public boolean equals(Object o) {
-        if (!(o instanceof MusicInfo)) {
-            return false;
-        }
-        return this.getId() == ((MusicInfo) o).getId();
+    public long getAlbumId() {
+        return albumId;
     }
 
-    public enum Type {
-        LOCAL,
-        ONLINE
-    }
-
-    public void setSelect(boolean select) {
-        isSelect = select;
-    }
-
-    public boolean isSelect() {
-        return isSelect;
+    public void setAlbumId(long albumId) {
+        this.albumId = albumId;
     }
 
     public MusicInfo() {
@@ -74,20 +37,29 @@ public class MusicInfo implements Serializable {
         title = pTitle;
     }
 
-    public String getArtist() {
-        return artist;
+    // 专辑
+    private long albumId;
+    // 持续时间
+    private long duration;
+    // 音乐路径
+    private String uri;
+    // [本地歌曲]专辑封面路径
+    private String coverUri;
+    // 文件名
+    private String fileName;
+    // [网络歌曲]专辑封面bitmap
+    private Bitmap cover;
+    // 文件大小
+    private long fileSize;
+    // 发行日期
+    private String year;
+
+    public Type getType() {
+        return type;
     }
 
-    public void setArtist(String artist) {
-        this.artist = artist;
-    }
-
-    public long getSize() {
-        return size;
-    }
-
-    public void setSize(long size) {
-        this.size = size;
+    public void setType(Type type) {
+        this.type = type;
     }
 
     public long getId() {
@@ -106,6 +78,14 @@ public class MusicInfo implements Serializable {
         this.title = title;
     }
 
+    public String getArtist() {
+        return artist;
+    }
+
+    public void setArtist(String artist) {
+        this.artist = artist;
+    }
+
     public String getAlbum() {
         return album;
     }
@@ -114,28 +94,75 @@ public class MusicInfo implements Serializable {
         this.album = album;
     }
 
-    public long getAlbumId() {
-        return albumId;
-    }
-
-    public void setAlbumId(long albumId) {
-        this.albumId = albumId;
-    }
-
-
-    public int getDuration() {
+    public long getDuration() {
         return duration;
     }
 
-    public void setDuration(int duration) {
+    public void setDuration(long duration) {
         this.duration = duration;
     }
 
-    public String getUrl() {
-        return url;
+    public String getUri() {
+        return uri;
     }
 
-    public void setUrl(String url) {
-        this.url = url;
+    public void setUri(String uri) {
+        this.uri = uri;
+    }
+
+    public String getCoverUri() {
+        return coverUri;
+    }
+
+    public void setCoverUri(String coverUri) {
+        this.coverUri = coverUri;
+    }
+
+    public String getFileName() {
+        return fileName;
+    }
+
+    public void setFileName(String fileName) {
+        this.fileName = fileName;
+    }
+
+    public Bitmap getCover() {
+        return cover;
+    }
+
+    public void setCover(Bitmap cover) {
+        this.cover = cover;
+    }
+
+    public long getFileSize() {
+        return fileSize;
+    }
+
+    public void setFileSize(long fileSize) {
+        this.fileSize = fileSize;
+    }
+
+    public String getYear() {
+        return year;
+    }
+
+    public void setYear(String year) {
+        this.year = year;
+    }
+
+    /**
+     * 对比本地歌曲是否相同
+     */
+    @Override
+    public boolean equals(Object o) {
+        if (!(o instanceof MusicInfo)) {
+            return false;
+        }
+        return this.getId() == ((MusicInfo) o).getId();
+    }
+
+    public enum Type {
+        LOCAL,
+        ONLINE
     }
 }

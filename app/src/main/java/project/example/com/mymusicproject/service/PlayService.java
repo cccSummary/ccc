@@ -153,10 +153,16 @@ public class PlayService extends Service implements MediaPlayer.OnCompletionList
         }
         mPlayingPosition = position;
         mPlayingMusic = getMusicList().get(mPlayingPosition);
+        play(mPlayingMusic);
+        Preferences.saveCurrentSongId(mPlayingMusic.getId());
+        return mPlayingPosition;
+    }
 
+    public void play(MusicInfo music) {
+        mPlayingMusic = music;
         try {
             mPlayer.reset();
-            mPlayer.setDataSource(mPlayingMusic.getUrl());
+            mPlayer.setDataSource(mPlayingMusic.getUri());
             mPlayer.prepare();
             start();
             if (mListener != null) {
@@ -165,8 +171,6 @@ public class PlayService extends Service implements MediaPlayer.OnCompletionList
         } catch (IOException e) {
             e.printStackTrace();
         }
-        Preferences.saveCurrentSongId(mPlayingMusic.getId());
-        return mPlayingPosition;
     }
 
     /**

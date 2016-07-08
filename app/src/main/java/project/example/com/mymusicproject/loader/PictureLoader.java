@@ -8,6 +8,8 @@ import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.ParcelFileDescriptor;
 
+import com.nostra13.universalimageloader.core.DisplayImageOptions;
+
 import java.io.FileDescriptor;
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -173,5 +175,15 @@ public class PictureLoader {
             }
         }
         return candidate;
+    }
+    public static DisplayImageOptions getCoverDisplayOptions() {
+        return new DisplayImageOptions.Builder()
+                .showStubImage(R.drawable.default_cover)
+                .showImageForEmptyUri(R.drawable.default_cover)
+                .showImageOnFail(R.drawable.default_cover)
+                .cacheInMemory(true)
+                .cacheOnDisc(true)
+                .bitmapConfig(Bitmap.Config.RGB_565)
+                .build();
     }
 }

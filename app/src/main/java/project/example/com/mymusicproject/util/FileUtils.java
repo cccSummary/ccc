@@ -34,7 +34,7 @@ public class FileUtils {
     public static String getLrcFilePath(MusicInfo music) {
         String lrcFilePath = getLrcDir() + FileUtils.getLrcFileName(music.getArtist(), music.getTitle());//歌词的存放地址
         if (!new File(lrcFilePath).exists()) {//判断文件是否存在
-            lrcFilePath = music.getUrl().replace(Constants.FILENAME_MP3, Constants.FILENAME_LRC);
+            lrcFilePath = music.getUri().replace(Constants.FILENAME_MP3, Constants.FILENAME_LRC);
         }
         return lrcFilePath;
     }

@@ -7,8 +7,11 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.nostra13.universalimageloader.core.ImageLoader;
+
 import project.example.com.mymusicproject.R;
 import project.example.com.mymusicproject.bind.BindView;
+import project.example.com.mymusicproject.loader.PictureLoader;
 import project.example.com.mymusicproject.model.JOnlineMusic;
 
 /**
@@ -50,15 +53,10 @@ public class OnlineMusicAdapter extends BaseRecyclerAdapter<JOnlineMusic> {
         }
 
         @Override
-        public void recycle() {
-            super.recycle();
-        }
-
-        @Override
         public void bind(Context context, int position, JOnlineMusic item) {
-            tvTitle.setText("sdfghfhhhhhhhhhhhhhhhhhhhhhj");
+            tvTitle.setText(item.getTitle());
             tvArtist.setText(item.getArtist_name());
-//            ImageLoaderUtil.displayRoundImageByHandle(mTeamList.getIcon(), logo, R.drawable.icon_default);
+            ImageLoader.getInstance().displayImage(item.getPic_small(), ivCover, PictureLoader.getCoverDisplayOptions());
         }
     }
 }

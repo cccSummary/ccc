@@ -34,30 +34,6 @@ public abstract class DownLoadLrc {
      * 先搜索歌曲，从而获得songid，用的是百度音乐api
      **/
     private void searchLrc() {
-//        OkHttpUtils.get().url("http://music.163.com/search/get/").
-//                addHeader("appver", "2.0.2").
-//                addParams("s", title).
-//                addParams("type", "1").
-//                addParams("limit", "10").
-//                addParams("offset", "0").
-//                build().
-//                execute(new JsonCallback<SearchData>(SearchData.class) {
-//                            @Override
-//                            public void onError(Call call, Exception e) {
-//
-//                            }
-//
-//                            @Override
-//                            public void onResponse(SearchData response) {
-//                                if (response == null || response.getSongs() == null) {
-//                                    onFinish(null);
-//                                    return;
-//                                }
-//                                String songID = String.valueOf(response.getSongs().get(0).getId());//
-//                                downloadLrc(songID);
-//                            }
-//                        }
-//                );
         OkHttpUtils.get().url(Constants.BASE_URL)
                 .addParams(Constants.PARAM_METHOD, Constants.METHOD_SEARCH_MUSIC)
                 .addParams(Constants.PARAM_QUERY, title+"-"+artist)

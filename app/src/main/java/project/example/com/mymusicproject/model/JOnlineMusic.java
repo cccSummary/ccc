@@ -2,7 +2,7 @@ package project.example.com.mymusicproject.model;
 
 /**
  * JavaBean
- * Created by wcy on 2015/12/20.
+ * 在线音乐
  */
 public class JOnlineMusic {
     private String pic_big;

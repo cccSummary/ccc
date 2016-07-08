@@ -78,9 +78,9 @@ public class MusicLoader {
                 musicInfo.setAlbum(album);
                 musicInfo.setAlbumId(albumId);
                 musicInfo.setDuration(duration);
-                musicInfo.setSize(size);
+//                musicInfo.setSize(size);
                 musicInfo.setArtist(artist);
-                musicInfo.setUrl(url);
+                musicInfo.setUri(url);
                 musicList.add(musicInfo);
 
             } while (cursor.moveToNext());

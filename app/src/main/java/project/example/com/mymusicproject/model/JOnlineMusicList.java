@@ -4,7 +4,7 @@ import java.util.List;
 
 /**
  * JavaBean
- * Created by wcy on 2015/12/20.
+ * 音乐列表
  */
 public class JOnlineMusicList {
     private List<JOnlineMusic> song_list;
